@@ -1,43 +1,98 @@
-# Project AeroSense: Predictive Air Quality Modeling for BASF Plant Safety
+# AeroSense – AI-Based Air Quality Prediction System for BASF
 
-## 👥 Group Project Submission
-* **Target Enterprise:** BASF SE (Environmental Engineering Division)
-* **Group Size:** 4-5 Students 
-* **Group Members:** 
-  * Yuvraj Singal (1025020093)
-  * Rishav Bansal (1025020065)
-  * Abdul Samad   (1025020066)
-  * Manthan Batra (1025020092)
-  * Harsh Banga   (1025020048)
-* **Course Assignment:** Machine Learning Supervised Regression Module
+AeroSense is an AI-based Air Quality Index (AQI) prediction system developed for the **AI for Engineers** project.
 
----
+The system uses environmental parameters and a trained **Gradient Boosting Regression** model to predict AQI.
 
-## 1. Problem Understanding & Core Objectives
-Industrial plants require hyper-local environmental forecasts to manage emissions footprint dynamically. This project builds a **Supervised Regression Architecture** to predict the precise **Air Quality Index (AQI)** for BASF urban-industrial areas. By analyzing incoming levels of PM2.5, PM10, toxic gasses (NO₂, SO₂, CO, O₃), and weather parameters, our model enables facility managers to adjust chemical processing metrics proactively before threshold breaches occur.
+## Team
 
----
+- Yuvraj Singal – 1025020093
+- Rishav Bansal – 1025020065
+- Abdul Samad – 1025020066
+- Manthan Batra – 1025020092
+- Harsh Banga – 1025020048
 
-## 2. Pre-processing & Workflow Pipeline
-Our data pipeline enforces institutional data cleaning patterns:
-1. **Data Ingestion:** Simulates historical sensor feeds matching BASF operational envelopes.
-2. **Imputation:** Missing sensor variables are handled via localized statistical median interpolation.
-3. **Feature Scaling:** `StandardScaler` transformations normalize numeric variance across varying units of concentration.
+## Project Objective
 
-### Technical Workflow Diagram
+To develop a machine learning system that can estimate AQI from air-quality and environmental parameters for industrial and urban air-quality monitoring.
+
+## Input Parameters
+
+The model uses:
+
+- PM2.5
+- PM10
+- NO₂
+- SO₂
+- CO
+- O₃
+- Temperature
+- Humidity
+- Wind Speed
+
+## Dataset
+
+The final dataset contains **10,000 records**:
+
+- 2,239 real-world records
+- 7,761 synthetic records
+
+The dataset is available in:
+
+`data/final_dataset.csv`
+
+## Machine Learning Models
+
+The project evaluated:
+
+1. Linear Regression
+2. Random Forest
+3. Gradient Boosting
+
+### Best Model
+
+**Gradient Boosting Regressor**
+
+Performance on the test set:
+
+- MAE: 24.282
+- RMSE: 45.907
+- R² Score: 0.8597
+
+The trained model is stored at:
+
+`models/aerosense_aqi_model.pkl`
+
+## AQI Categories
+
+| AQI | Category |
+|---|---|
+| 0–50 | Good |
+| 51–100 | Satisfactory |
+| 101–200 | Moderately Polluted |
+| 201–300 | Poor |
+| 301–400 | Very Poor |
+| 401–500 | Severe |
+
+## Project Structure
+
 ```text
-[Sensor Inputs] ──► [Median Imputation] ──► [Standard Scaling] ──► [Baseline / Ensemble Training] ──► [Evaluations]
-```
-
----
-
-## 3. Performance Results & Engineering Takeaways
-We compared a standard baseline approach to an advanced ensemble tree methodology:
-
-| Performance Parameter | Linear Regression (Baseline) | Random Forest Regressor (Advanced) |
-| :--- | :--- | :--- |
-| **MAE** (Lower is Better) | ~3.20 | **~1.15** |
-| **RMSE** (Safety Critical) | ~4.12 | **~1.58** |
-| **$R^2$ Variance Score** | ~0.9105 | **~0.9855** |
-
-**Conclusion:** The Random Forest algorithm drastically handles the complex chemical interaction tracking required by BASF, minimizing higher order errors (RMSE) effectively.
+AeroSense-BASF-AQI/
+│
+├── data/
+│   └── final_dataset.csv
+│
+├── models/
+│   └── aerosense_aqi_model.pkl
+│
+├── results/
+│   ├── model_comparison.csv
+│   ├── test_predictions.csv
+│   ├── feature_importance.csv
+│   └── AeroSense_Model_Summary.csv
+│
+├── app.py
+├── data_preprocessing.py
+├── model_training.py
+├── requirements.txt
+└── README.md
