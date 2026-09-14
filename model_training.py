@@ -1,56 +1,75 @@
-"""
-Project AeroSense: Model Development & Evaluation
-"""
-
-import numpy as np
 import pandas as pd
-from data_preprocessing import process_and_split
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
+import joblib
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import matplotlib.pyplot as plt
 
-def run_model_pipeline():
-    X_train, X_test, y_train, y_test = process_and_split()
-    
-    print("\n--- Model Training Phase ---")
-    lr = LinearRegression()
-    lr.fit(X_train, y_train)
-    
-    rf = RandomForestRegressor(n_estimators=150, random_state=42)
-    rf.fit(X_train, y_train)
-    
-    lr_preds = lr.predict(X_test)
-    rf_preds = rf.predict(X_test)
-    
-    print("\n--- Model Performance Evaluation ---")
-    models = {"Linear Regression (Baseline)": lr_preds, "Random Forest (Advanced)": rf_preds}
-    
-    for name, preds in models.items():
-        mae = mean_absolute_error(y_test, preds)
-        rmse = np.sqrt(mean_squared_error(y_test, preds))
-        r2 = r2_score(y_test, preds)
-        
-        print(f"\n[{name}]")
-        print(f"  Mean Absolute Error (MAE)   : {mae:.2f}")
-        print(f"  Root Mean Squared Error (RMSE): {rmse:.2f}")
-        print(f"  R-squared (Accuracy Metric) : {r2:.4f}")
-        
-    importances = rf.feature_importances_
-    features = X_train.columns
-    importance_df = pd.DataFrame({'Feature': features, 'Importance': importances}).sort_values('Importance', ascending=False)
-    
-    print("\n--- Innovation Insights: Key Drivers of AQI ---")
-    print(importance_df.to_string(index=False))
-    
-    plt.figure(figsize=(8, 4))
-    plt.barh(importance_df['Feature'][::-1], importance_df['Importance'][::-1], color='dodgerblue')
-    plt.title("BASF Operational Dashboard: Metric Importance Ranking")
-    plt.xlabel("Relative Influence Score")
-    plt.tight_layout()
-    plt.savefig("feature_importance.png")
-    plt.close()
 
-if __name__ == "__main__":
-    run_model_pipeline()
+# Load final dataset
+DATA_PATH = "data/final_dataset.csv"
+MODEL_PATH = "models/aerosense_aqi_model.pkl"
+
+df = pd.read_csv(DATA_PATH)
+
+# Features and target
+features = [
+    "PM2_5",
+    "PM10",
+    "NO2",
+    "SO2",
+    "CO",
+    "O3",
+    "Temperature",
+    "Humidity",
+    "Wind_Speed"
+]
+
+X = df[features]
+y = df["AQI"]
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42
+)
+
+# Gradient Boosting model
+model = Pipeline([
+    ("imputer", SimpleImputer(strategy="median")),
+    ("regressor", GradientBoostingRegressor(
+        n_estimators=200,
+        learning_rate=0.05,
+        max_depth=3,
+        random_state=42
+    ))
+])
+
+# Train
+model.fit(X_train, y_train)
+
+# Predictions
+predictions = model.predict(X_test)
+
+# Evaluation
+mae = mean_absolute_error(y_test, predictions)
+rmse = mean_squared_error(y_test, predictions) ** 0.5
+r2 = r2_score(y_test, predictions)
+
+print("AeroSense AQI Model")
+print("-------------------")
+print(f"Training samples: {len(X_train)}")
+print(f"Testing samples: {len(X_test)}")
+print(f"MAE: {mae:.3f}")
+print(f"RMSE: {rmse:.3f}")
+print(f"R² Score: {r2:.4f}")
+
+# Save trained model
+joblib.dump(model, MODEL_PATH)
+
+print(f"\nModel saved to: {MODEL_PATH}")
 
