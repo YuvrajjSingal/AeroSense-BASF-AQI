@@ -1,0 +1,10 @@
+Metric,Value
+Best Model,Gradient Boosting
+Training Records,8000
+Testing Records,2000
+MAE,24.282
+RMSE,45.907
+R2 Score,0.8597
+Total Dataset Records,10000
+Real Records,2239
+Synthetic Records,7761
